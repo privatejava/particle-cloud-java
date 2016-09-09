@@ -14,55 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package np.com.ngopal.particle.cloud.api.v1;
+package np.com.ngopal.particle.cloud;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import java.util.HashMap;
-import java.util.Map;
-import lombok.*;
-import np.com.ngopal.particle.cloud.AuthClient;
-import np.com.ngopal.particle.cloud.api.AbstractAPI;
-import np.com.ngopal.particle.cloud.api.exception.APIException;
-import np.com.ngopal.particle.cloud.api.resources.CustomerResource;
-import org.apache.commons.codec.binary.Base64;
-import org.json.JSONObject;
+import java.io.IOException;
+import org.apache.commons.io.IOUtils;
 
 /**
  *
  * @author NGM
  */
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-public final class APIv1 extends AbstractAPI {
+public class CloudAPI {
 
-    private String version = "v1";
-
-    private String accessToken;
-
-    @Getter(AccessLevel.NONE)
-    @Setter
-    private CustomerResource customerResource;
-
-    public APIv1(AuthClient client) {
-        this.client = client;
-        this.customerResource = customerResource;
-    }
-
-    public APIv1(String token) {
-        isAccessToken = true;
-        this.accessToken = token;
-        this.customerResource = customerResource;
-    }
-
-    public String getRestUrl() {
-        return String.format("%s://%s/%s", getSchema(), getHost(), getVersion());
-    }
-
-    public void d(String[] args) throws UnirestException {
+    public static void main(String[] args) throws UnirestException, IOException {
         HttpResponse<JsonNode> jsonResponse = Unirest.post("https://api.particle.io/oauth/token")
                 .basicAuth("marcopolo-web-x-5662", "3c9ae65f71a011505dd9d746e5b9a725d34b717b")
                 .header("accept", "application/json")
@@ -70,11 +37,7 @@ public final class APIv1 extends AbstractAPI {
                 .field("username", "brian.quinn@cbts.net")
                 .field("password", "changemeCBTS!")
                 .asJson();
-    }
-
-    @Override
-    public CustomerResource customers() {
-        return this.customerResource;
+        System.out.println(IOUtils.toString(jsonResponse.getRawBody()));
     }
 
 }
