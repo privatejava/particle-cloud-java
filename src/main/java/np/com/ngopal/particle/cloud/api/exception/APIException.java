@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2016 Narayan G. Maharjan <me@ngopal.com.np>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,6 +25,8 @@ import lombok.Getter;
 @Getter
 public class APIException extends Exception {
 
+    private String errorDescription;
+
     private String error;
 
     private int code;
@@ -32,9 +34,16 @@ public class APIException extends Exception {
     private boolean ok;
 
     public APIException(String error, int code, boolean ok) {
+        super(error);
         this.error = error;
         this.code = code;
         this.ok = ok;
+    }
+
+    public APIException(String error, String errorDescription) {
+        super(error);
+        this.error = error;
+        this.errorDescription = errorDescription;
     }
 
     public APIException(String message, Throwable cause) {

@@ -14,24 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package np.com.ngopal.particle.cloud;
-
-import java.util.Date;
+package np.com.ngopal.particle.cloud.api;
 
 /**
  *
- * @author NGM
+ * @author Narayan <me@ngopal.com.np>
  */
-public interface AccessToken {
+public enum APIMethodType {
 
-    String getAccessToken();
-
-    String getRefreshToken();
-
-    Date getExpiresIn();
-
-    String getTokenType();
-
-    String getClient();
+    GET, POST, PUT, DELETE;
 
 }

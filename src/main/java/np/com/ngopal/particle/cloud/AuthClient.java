@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2016 Narayan G. Maharjan <me@ngopal.com.np>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,10 @@
  */
 package np.com.ngopal.particle.cloud;
 
+import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  *
@@ -25,13 +27,20 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@ToString
 public abstract class AuthClient implements AccessToken {
+
+    private String email;
+
+    private String password;
 
     private String accessToken;
 
+    private String tokenType;
+
     private String refreshToken;
 
-    private Long expiresIn;
+    private Date expiresIn;
 
     public abstract String getUser();
 

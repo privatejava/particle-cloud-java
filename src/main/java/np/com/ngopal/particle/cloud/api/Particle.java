@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2016 Narayan G. Maharjan <me@ngopal.com.np>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,10 +17,11 @@
 package np.com.ngopal.particle.cloud.api;
 
 import np.com.ngopal.particle.cloud.AuthClient;
-import np.com.ngopal.particle.cloud.BasicAuthClient;
 import np.com.ngopal.particle.cloud.OAuthClient;
 import np.com.ngopal.particle.cloud.api.v1.APIv1;
+import np.com.ngopal.particle.cloud.api.v1.resources.AuthResourceImpl;
 import np.com.ngopal.particle.cloud.api.v1.resources.CustomerResourceImpl;
+import np.com.ngopal.particle.cloud.api.v1.resources.DeviceResourceImpl;
 
 /**
  *
@@ -36,10 +37,15 @@ public final class Particle {
 
     private API api;
 
-    private Particle(String user, String secret) {
+    private Particle(String user, String secret, boolean isClient) {
         this.isToken = false;
-
-        client = new BasicAuthClient(user, secret);
+        if (isClient) {
+            client = new OAuthClient(user, secret);
+        } else {
+            client = new OAuthClient("", "");
+            client.setEmail(user);
+            client.setPassword(secret);
+        }
 
     }
 
@@ -50,12 +56,12 @@ public final class Particle {
     }
 
     public static Particle client(String user, String pass) {
-        Particle particle = new Particle(user, pass);
+        Particle particle = new Particle(user, pass, true);
         return particle;
     }
 
     public static Particle basic(String user, String pass) {
-        Particle particle = new Particle(user, pass);
+        Particle particle = new Particle(user, pass, false);
         return particle;
     }
 
@@ -69,6 +75,8 @@ public final class Particle {
             APIv1 apiV1 = null;
             apiV1 = client == null ? new APIv1(token) : new APIv1(client);
             apiV1.setCustomerResource(new CustomerResourceImpl(apiV1));
+            apiV1.setDeviceResource(new DeviceResourceImpl(apiV1));
+            apiV1.setAuthResource(new AuthResourceImpl(apiV1));
             api = apiV1;
         }
         return api;

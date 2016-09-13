@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2016 Narayan G. Maharjan <me@ngopal.com.np>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,15 +20,13 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.*;
 import np.com.ngopal.particle.cloud.AuthClient;
+import np.com.ngopal.particle.cloud.OAuthClient;
 import np.com.ngopal.particle.cloud.api.AbstractAPI;
-import np.com.ngopal.particle.cloud.api.exception.APIException;
+import np.com.ngopal.particle.cloud.api.resources.AuthResource;
 import np.com.ngopal.particle.cloud.api.resources.CustomerResource;
-import org.apache.commons.codec.binary.Base64;
-import org.json.JSONObject;
+import np.com.ngopal.particle.cloud.api.resources.DeviceResource;
 
 /**
  *
@@ -41,25 +39,33 @@ public final class APIv1 extends AbstractAPI {
 
     private String version = "v1";
 
-    private String accessToken;
-
     @Getter(AccessLevel.NONE)
     @Setter
     private CustomerResource customerResource;
 
+    @Getter(AccessLevel.NONE)
+    @Setter
+    private DeviceResource deviceResource;
+
+    @Getter(AccessLevel.NONE)
+    @Setter
+    private AuthResource authResource;
+
     public APIv1(AuthClient client) {
         this.client = client;
-        this.customerResource = customerResource;
     }
 
     public APIv1(String token) {
-        isAccessToken = true;
-        this.accessToken = token;
-        this.customerResource = customerResource;
+        this.client = new OAuthClient("", "");
+        this.client.setAccessToken(token);
     }
 
     public String getRestUrl() {
         return String.format("%s://%s/%s", getSchema(), getHost(), getVersion());
+    }
+
+    public String getNonVersionedRestUrl() {
+        return String.format("%s://%s", getSchema(), getHost());
     }
 
     public void d(String[] args) throws UnirestException {
@@ -75,6 +81,16 @@ public final class APIv1 extends AbstractAPI {
     @Override
     public CustomerResource customers() {
         return this.customerResource;
+    }
+
+    @Override
+    public DeviceResource devices() {
+        return this.deviceResource;
+    }
+
+    @Override
+    public AuthResource auth() {
+        return this.authResource;
     }
 
 }

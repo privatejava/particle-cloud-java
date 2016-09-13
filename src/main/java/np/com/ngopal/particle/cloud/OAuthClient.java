@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2016 Narayan G. Maharjan <me@ngopal.com.np>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,34 +16,28 @@
  */
 package np.com.ngopal.particle.cloud;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 /**
  *
  * @author NGM
  */
 @Getter
+@ToString(callSuper = true)
 @AllArgsConstructor
 public class OAuthClient extends AuthClient {
 
     private final String name;
 
-    private OAuthClientType type;
-
-    private String id;
-
     private final String secret;
-
-    public OAuthClient(String name, String secret) {
-        this.name = name;
-        this.secret = secret;
-    }
 
     @Override
     public String getUser() {
+        return name;
+    }
+
+    @Override
+    public String getClient() {
         return name;
     }
 

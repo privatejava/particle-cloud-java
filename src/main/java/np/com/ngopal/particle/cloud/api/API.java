@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2016 Narayan G. Maharjan <me@ngopal.com.np>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,8 +17,11 @@
 package np.com.ngopal.particle.cloud.api;
 
 import java.util.Map;
+import np.com.ngopal.particle.cloud.AuthClient;
 import np.com.ngopal.particle.cloud.api.exception.APIException;
+import np.com.ngopal.particle.cloud.api.resources.AuthResource;
 import np.com.ngopal.particle.cloud.api.resources.CustomerResource;
+import np.com.ngopal.particle.cloud.api.resources.DeviceResource;
 import org.json.JSONObject;
 
 /**
@@ -27,7 +30,11 @@ import org.json.JSONObject;
  */
 public interface API {
 
+    public String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+
     public String getRestUrl();
+
+    public String getNonVersionedRestUrl();
 
     public String getSchema();
 
@@ -35,7 +42,13 @@ public interface API {
 
     public String getVersion();
 
+    public AuthClient getClient();
+
     public CustomerResource customers();
+
+    public DeviceResource devices();
+
+    public AuthResource auth();
 
     public Map<String, String> getAuthHeaders();
 

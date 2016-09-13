@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2016 Narayan G. Maharjan <me@ngopal.com.np>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,9 +16,11 @@
  */
 package np.com.ngopal.particle.cloud.api;
 
+import static java.lang.Math.log;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import np.com.ngopal.particle.cloud.AuthClient;
 import np.com.ngopal.particle.cloud.api.exception.APIException;
 import org.apache.commons.codec.binary.Base64;
@@ -29,21 +31,24 @@ import org.json.JSONObject;
  * @author NGM
  */
 @Getter
+@Slf4j
 public abstract class AbstractAPI implements API {
 
     private String host = "api.particle.io";
 
     private String schema = "https";
 
-    protected boolean isAccessToken = false;
-
     protected AuthClient client;
 
     @Override
     public Map<String, String> getAuthHeaders() {
         Map<String, String> headers = new HashMap<>();
-        if (!isAccessToken) {
-            headers.put("Authorization", "Basic " + Base64.encodeBase64String(new StringBuilder().append(getClient().getUser()).append(":").append(getClient().getSecret()).toString().getBytes()));
+        if (getClient().getAccessToken() == null) {
+            if (getClient().getUser() == null || getClient().getUser().isEmpty()) {
+                headers.put("Authorization", "Basic " + Base64.encodeBase64String("particle:particle".getBytes()));
+            } else {
+                headers.put("Authorization", "Basic " + Base64.encodeBase64String(new StringBuilder().append(getClient().getUser()).append(":").append(getClient().getSecret()).toString().getBytes()));
+            }
         } else {
             headers.put("Authorization", "Bearer " + getClient().getAccessToken());
         }
@@ -52,7 +57,19 @@ public abstract class AbstractAPI implements API {
 
     @Override
     public void handleException(JSONObject object) throws APIException {
-        throw new APIException(object.getString("error"), object.getInt("code"), object.getBoolean("ok"));
+        int code = object.has("code") ? object.getInt("code") : 0;
+        boolean ok = object.has("ok") ? object.getBoolean("ok") : false;
+        String error = object.has("error") ? object.getString("error") : "";
+        String errorDescription = object.has("error_description") ? object.getString("error_description") : "";
+        log.info("Object: {}", object);
+        APIException ex = null;
+        if (code > 1) {
+            ex = new APIException(error, code, ok);
+        } else {
+            ex = new APIException(error, errorDescription);
+        }
+
+        throw ex;
     }
 
 }

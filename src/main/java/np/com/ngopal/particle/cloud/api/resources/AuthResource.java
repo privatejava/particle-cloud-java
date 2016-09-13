@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2016 Narayan G. Maharjan <me@ngopal.com.np>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,21 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package np.com.ngopal.particle.cloud;
+package np.com.ngopal.particle.cloud.api.resources;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import java.util.List;
+import np.com.ngopal.particle.cloud.AccessToken;
+import np.com.ngopal.particle.cloud.Customer;
+import np.com.ngopal.particle.cloud.api.API;
+import np.com.ngopal.particle.cloud.api.exception.APIException;
 
 /**
  *
- * @author NGM
+ * @author Narayan <me@ngopal.com.np>
  */
-@Getter
-@AllArgsConstructor
-public class BasicAuthClient extends AuthClient {
+public abstract class AuthResource extends APIResource {
 
-    private String user;
+    public AuthResource(API api) {
+        super(api);
+    }
 
-    private String secret;
+    public abstract AccessToken generateAccessToken(String grantType) throws APIException;
+
+    public abstract List<AccessToken> listAccessToken() throws APIException;
 
 }

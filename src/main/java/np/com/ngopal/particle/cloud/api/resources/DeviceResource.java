@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2016 Narayan G. Maharjan <me@ngopal.com.np>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,6 +21,7 @@ import lombok.Getter;
 import np.com.ngopal.particle.cloud.Device;
 import np.com.ngopal.particle.cloud.DeviceClaim;
 import np.com.ngopal.particle.cloud.api.API;
+import np.com.ngopal.particle.cloud.api.exception.APIException;
 
 /**
  *
@@ -33,7 +34,7 @@ public abstract class DeviceResource extends APIResource {
         super(api);
     }
 
-    public abstract List<Device> listDevices();
+    public abstract List<Device> listDevices() throws APIException;
 
     public abstract Device getDeviceInformation(String deviceId);
 

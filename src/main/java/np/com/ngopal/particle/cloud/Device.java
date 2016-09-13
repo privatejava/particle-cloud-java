@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2016 Narayan G. Maharjan <me@ngopal.com.np>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,10 +19,7 @@ package np.com.ngopal.particle.cloud;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 /**
  *
@@ -30,6 +27,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class Device {
@@ -42,14 +40,28 @@ public class Device {
 
     private String lastIpAddress;
 
-    private String productId;
+    private Long productId;
 
-    private boolean connected;
+    private Boolean connected;
 
     private List<Map<String, String>> variables;
 
     private List<String> functions;
 
     private Date lastHeard;
+
+    private Boolean cellular;
+
+    private Long platformId;
+
+    private String status;
+
+    private String imei;
+
+    private String currentBuildTarget;
+
+    private String lastIccid;
+
+    private String pinnedBuildTarget;
 
 }
