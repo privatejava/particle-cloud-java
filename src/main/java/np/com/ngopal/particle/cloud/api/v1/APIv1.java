@@ -21,7 +21,8 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import lombok.*;
-import np.com.ngopal.particle.cloud.AuthClient;
+import np.com.ngopal.particle.cloud.AuthUser;
+import np.com.ngopal.particle.cloud.BasicAuth;
 import np.com.ngopal.particle.cloud.OAuthClient;
 import np.com.ngopal.particle.cloud.api.AbstractAPI;
 import np.com.ngopal.particle.cloud.api.resources.AuthResource;
@@ -51,13 +52,13 @@ public final class APIv1 extends AbstractAPI {
     @Setter
     private AuthResource authResource;
 
-    public APIv1(AuthClient client) {
-        this.client = client;
+    public APIv1(AuthUser client) {
+        this.authUser = client;
     }
 
     public APIv1(String token) {
-        this.client = new OAuthClient("", "");
-        this.client.setAccessToken(token);
+        this.authUser = new OAuthClient("", "");
+        this.authUser.setAccessToken(token);
     }
 
     public String getRestUrl() {
@@ -91,6 +92,11 @@ public final class APIv1 extends AbstractAPI {
     @Override
     public AuthResource auth() {
         return this.authResource;
+    }
+
+    @Override
+    public boolean hasBasicCredential() {
+        return getAuthUser() instanceof BasicAuth;
     }
 
 }

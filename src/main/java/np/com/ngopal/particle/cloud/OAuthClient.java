@@ -25,20 +25,20 @@ import lombok.*;
 @Getter
 @ToString(callSuper = true)
 @AllArgsConstructor
-public class OAuthClient extends AuthClient {
+public class OAuthClient extends AuthUser {
 
     private final String name;
 
     private final String secret;
 
     @Override
-    public String getUser() {
+    public String getId() {
         return name;
     }
 
     @Override
-    public String getClient() {
-        return name;
+    public String getGrantType() {
+        return "client_credentials";
     }
 
 }

@@ -14,22 +14,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package np.com.ngopal.particle.cloud.api.resources;
+package np.com.ngopal.particle.cloud;
 
-import java.util.List;
-import np.com.ngopal.particle.cloud.AccessToken;
-import np.com.ngopal.particle.cloud.Customer;
-import np.com.ngopal.particle.cloud.api.API;
-import np.com.ngopal.particle.cloud.api.exception.APIException;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 
 /**
  *
  * @author Narayan <me@ngopal.com.np>
  */
-public interface AuthResource {
+@Getter
+@ToString(callSuper = true)
+@AllArgsConstructor
+public class BasicAuth extends AuthUser {
 
-    AccessToken generateAccessToken() throws APIException;
+    private final String id;
 
-    List<AccessToken> listAccessToken() throws APIException;
+    private final String secret;
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public String getSecret() {
+        return secret;
+    }
+
+    @Override
+    public String getGrantType() {
+        return "password";
+    }
 
 }

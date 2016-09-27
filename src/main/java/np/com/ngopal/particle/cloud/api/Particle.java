@@ -16,7 +16,8 @@
  */
 package np.com.ngopal.particle.cloud.api;
 
-import np.com.ngopal.particle.cloud.AuthClient;
+import np.com.ngopal.particle.cloud.AuthUser;
+import np.com.ngopal.particle.cloud.BasicAuth;
 import np.com.ngopal.particle.cloud.OAuthClient;
 import np.com.ngopal.particle.cloud.api.v1.APIv1;
 import np.com.ngopal.particle.cloud.api.v1.resources.AuthResourceImpl;
@@ -31,7 +32,7 @@ public final class Particle {
 
     private boolean isToken = false;
 
-    private AuthClient client;
+    private AuthUser client;
 
     private String token;
 
@@ -42,9 +43,7 @@ public final class Particle {
         if (isClient) {
             client = new OAuthClient(user, secret);
         } else {
-            client = new OAuthClient("", "");
-            client.setEmail(user);
-            client.setPassword(secret);
+            client = new BasicAuth(user, secret);
         }
 
     }

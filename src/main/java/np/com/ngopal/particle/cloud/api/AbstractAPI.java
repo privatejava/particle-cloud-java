@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import np.com.ngopal.particle.cloud.AuthClient;
+import np.com.ngopal.particle.cloud.AuthUser;
 import np.com.ngopal.particle.cloud.api.exception.APIException;
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONObject;
@@ -38,20 +38,41 @@ public abstract class AbstractAPI implements API {
 
     private String schema = "https";
 
-    protected AuthClient client;
+    protected AuthUser authUser;
 
     @Override
-    public Map<String, String> getAuthHeaders() {
+    public Map<String, String> getAuthHeaders() throws APIException {
+        return getAuthHeaders(false);
+    }
+
+    @Override
+    public Map<String, String> getAuthHeaders(boolean addAuthExplict) throws APIException {
         Map<String, String> headers = new HashMap<>();
-        if (getClient().getAccessToken() == null) {
-            if (getClient().getUser() == null || getClient().getUser().isEmpty()) {
-                headers.put("Authorization", "Basic " + Base64.encodeBase64String("particle:particle".getBytes()));
+        if (getAuthUser().getAccessToken() == null || getAuthUser().getAccessToken().isEmpty()) {
+
+            if (hasBasicCredential() && !addAuthExplict) {
+                headers.put("Authorization", "Basic "
+                        + Base64.encodeBase64String("particle:particle".getBytes()));
             } else {
-                headers.put("Authorization", "Basic " + Base64.encodeBase64String(new StringBuilder().append(getClient().getUser()).append(":").append(getClient().getSecret()).toString().getBytes()));
+                headers.put("Authorization", "Basic "
+                        + Base64.encodeBase64String(new StringBuilder().append(getAuthUser().getId()).append(":").append(getAuthUser().getSecret()).toString().getBytes()));
             }
-        } else {
-            headers.put("Authorization", "Bearer " + getClient().getAccessToken());
+
         }
+        log.debug("HEADERS: {}", headers);
+        //headers.put("Authorization", "Bearer " + getAuthUser().getAccessToken());
+
+        return headers;
+    }
+
+    @Override
+    public Map<String, String> getAccessTokenAuthHeaders() throws APIException {
+        Map<String, String> headers = new HashMap<>();
+        if (getAuthUser().getAccessToken() == null || getAuthUser().getAccessToken().isEmpty()) {
+            auth().generateAccessToken();
+        }
+        headers.put("Authorization", "Bearer " + getAuthUser().getAccessToken());
+
         return headers;
     }
 

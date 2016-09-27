@@ -22,24 +22,17 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
+import com.mashape.unirest.request.body.MultipartBody;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javafx.util.Duration;
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import np.com.ngopal.particle.cloud.AccessToken;
 import np.com.ngopal.particle.cloud.OAuthClient;
-import np.com.ngopal.particle.cloud.OAuthClientType;
 import np.com.ngopal.particle.cloud.api.API;
 import np.com.ngopal.particle.cloud.api.APIMethodType;
-import np.com.ngopal.particle.cloud.api.AbstractAPI;
 import np.com.ngopal.particle.cloud.api.exception.APIException;
-import np.com.ngopal.particle.cloud.api.resources.AuthResource;
+import np.com.ngopal.particle.cloud.api.resources.AbstractAuthResource;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -48,7 +41,7 @@ import org.json.JSONObject;
  * @author Narayan <me@ngopal.com.np>
  */
 @Slf4j
-public class AuthResourceImpl extends AuthResource {
+public class AuthResourceImpl extends AbstractAuthResource {
 
     private String baseURIPattern = "/access_tokens";
 
@@ -57,23 +50,33 @@ public class AuthResourceImpl extends AuthResource {
     }
 
     @Override
-    public AccessToken generateAccessToken(String grantType) throws APIException {
-        AbstractAPI api_ = (AbstractAPI) api;
-        try {
+    public AccessToken generateAccessToken() throws APIException {
+        return generateAccessToken(api.getAuthUser().getGrantType());
+    }
 
-            HttpResponse<JsonNode> response = ((HttpRequestWithBody) getAuthCreateRestClient(APIMethodType.POST, "/oauth/token"))
-                    .field("username", api_.getClient().getEmail())
-                    .field("password", api.getClient().getPassword())
-                    .field("grant_type", grantType).asJson();
+    private AccessToken generateAccessToken(String grantType) throws APIException {
+
+        try {
+            Map<String, String> headers = api.getAuthHeaders();
+            log.debug("Params: {}={}", "grant_type", grantType);
+            MultipartBody req = ((HttpRequestWithBody) Unirest.post(api.getNonVersionedRestUrl() + "/oauth/token").headers(headers))
+                    .field("grant_type", grantType);
+
+            if (api.hasBasicCredential()) {
+                req.field("username", api.getAuthUser().getId());
+                req.field("password", api.getAuthUser().getSecret());
+            }
+
+            HttpResponse<JsonNode> response = req.asJson();
 
             if (response.getStatus() == 200) {
                 JSONObject object = response.getBody().getObject();
                 log.debug("{}", object);
-                api_.getClient().setAccessToken(object.getString("access_token"));
+                api.getAuthUser().setAccessToken(object.getString("access_token"));
                 Long date = System.currentTimeMillis() + (object.getLong("expires_in") * 1000);
-                api_.getClient().setExpiresIn(new Date(date));
-                api_.getClient().setRefreshToken(object.getString("refresh_token"));
-                api_.getClient().setTokenType(object.getString("token_type"));
+                api.getAuthUser().setExpiresIn(new Date(date));
+                api.getAuthUser().setRefreshToken(object.getString("refresh_token"));
+                api.getAuthUser().setTokenType(object.getString("token_type"));
             } else {
                 api.handleException(response.getBody().getObject());
             }
@@ -81,15 +84,17 @@ public class AuthResourceImpl extends AuthResource {
             log.error("{}", ex);
             throw new APIException(ex);
         }
-        return api_.getClient();
+        return api.getAuthUser();
     }
 
     @Override
     public List<AccessToken> listAccessToken() throws APIException {
         List<AccessToken> tokens = new ArrayList<>();
         try {
-            HttpResponse<JsonNode> response = getAuthCreateRestClient(APIMethodType.GET).asJson();
+            HttpResponse<JsonNode> response = Unirest.get(api.getRestUrl() + getBaseURIPattern()).headers(api.getAuthHeaders(true)).asJson();
+            log.debug("URL: {}", api.getRestUrl() + getBaseURIPattern());
             if (response.getStatus() == 200) {
+                log.debug("Response: {}", response.getBody());
                 JSONArray array = response.getBody().getArray();
                 if (array.length() > 0) {
 
@@ -132,10 +137,11 @@ public class AuthResourceImpl extends AuthResource {
         return baseURIPattern;
     }
 
-    private HttpRequest getAuthCreateRestClient(APIMethodType type, String uri) {
+    private HttpRequest getAuthCreateRestClient(APIMethodType type, String uri)
+            throws APIException {
 
         HttpRequestWithBody req = null;
-        Map<String, String> headers = getApi().getAuthHeaders();
+        Map<String, String> headers = getApi().getAccessTokenAuthHeaders();
         String url = api.getNonVersionedRestUrl() + (uri == null ? getBaseURIPattern() : uri);
         log.debug("Headers: {}", headers);
         log.debug("URL : {}", url);
@@ -151,7 +157,7 @@ public class AuthResourceImpl extends AuthResource {
         return null;
     }
 
-    private HttpRequest getAuthCreateRestClient(APIMethodType type) {
+    private HttpRequest getAuthCreateRestClient(APIMethodType type) throws APIException {
         return getAuthCreateRestClient(type, null);
     }
 

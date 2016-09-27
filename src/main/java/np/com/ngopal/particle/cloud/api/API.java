@@ -17,7 +17,7 @@
 package np.com.ngopal.particle.cloud.api;
 
 import java.util.Map;
-import np.com.ngopal.particle.cloud.AuthClient;
+import np.com.ngopal.particle.cloud.AuthUser;
 import np.com.ngopal.particle.cloud.api.exception.APIException;
 import np.com.ngopal.particle.cloud.api.resources.AuthResource;
 import np.com.ngopal.particle.cloud.api.resources.CustomerResource;
@@ -42,15 +42,21 @@ public interface API {
 
     public String getVersion();
 
-    public AuthClient getClient();
+    public AuthUser getAuthUser();
+
+    public boolean hasBasicCredential();
 
     public CustomerResource customers();
 
     public DeviceResource devices();
 
-    public AuthResource auth();
+    public <T extends AuthResource> T auth();
 
-    public Map<String, String> getAuthHeaders();
+    public Map<String, String> getAuthHeaders(boolean addAuthExplict) throws APIException;
+
+    public Map<String, String> getAuthHeaders() throws APIException;
+
+    public Map<String, String> getAccessTokenAuthHeaders() throws APIException;
 
     public void handleException(JSONObject object) throws APIException;
 

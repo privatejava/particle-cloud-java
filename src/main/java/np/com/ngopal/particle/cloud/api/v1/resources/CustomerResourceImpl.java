@@ -45,12 +45,13 @@ public class CustomerResourceImpl extends CustomerResource {
         super(api);
     }
 
-    private HttpRequestWithBody getCustomerCreateRestClient(String productIdOrSlug) {
+    private HttpRequestWithBody getCustomerCreateRestClient(String productIdOrSlug)
+            throws APIException {
         log.debug("URL : {}" + api.getRestUrl() + getBaseURIPattern().replace(":productIdOrSlug", productIdOrSlug));
-        log.debug("Headers: {}" + getApi().getAuthHeaders());
+        log.debug("Headers: {}" + getApi().getAccessTokenAuthHeaders());
 
         return Unirest.post(api.getRestUrl() + getBaseURIPattern().replace(":productIdOrSlug", productIdOrSlug))
-                .headers(getApi().getAuthHeaders());
+                .headers(getApi().getAccessTokenAuthHeaders());
     }
 
     @Override

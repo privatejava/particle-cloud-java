@@ -32,6 +32,4 @@ public interface AccessToken {
 
     String getTokenType();
 
-    String getClient();
-
 }

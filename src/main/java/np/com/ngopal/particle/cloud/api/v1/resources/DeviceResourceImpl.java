@@ -113,18 +113,10 @@ public class DeviceResourceImpl extends DeviceResource {
         return baseURIPattern;
     }
 
-    private HttpRequest getDeviceCreateRestClient(APIMethodType type, String deviceId, String name) {
-        String token = api.getClient().getAccessToken();
-        if (token == null) {
-            try {
-                token = api.auth().generateAccessToken("password").getAccessToken();
-            } catch (APIException ex) {
-                Logger.getLogger(DeviceResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+    private HttpRequest getDeviceCreateRestClient(APIMethodType type, String deviceId, String name)
+            throws APIException {
 
-        HttpRequestWithBody req = null;
-        Map<String, String> headers = getApi().getAuthHeaders();
+        Map<String, String> headers = getApi().getAccessTokenAuthHeaders();
         log.debug("Headers: {}", headers);
 
         String url = api.getRestUrl() + getBaseURIPattern().replace("/:deviceId", deviceId == null ? "" : "/" + deviceId).replace(":name", name == null ? "" : "/" + name);

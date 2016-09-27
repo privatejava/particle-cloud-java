@@ -28,11 +28,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public abstract class AuthClient implements AccessToken {
-
-    private String email;
-
-    private String password;
+public abstract class AuthUser implements AccessToken {
 
     private String accessToken;
 
@@ -42,7 +38,9 @@ public abstract class AuthClient implements AccessToken {
 
     private Date expiresIn;
 
-    public abstract String getUser();
+    public abstract String getGrantType();
+
+    public abstract String getId();
 
     public abstract String getSecret();
 

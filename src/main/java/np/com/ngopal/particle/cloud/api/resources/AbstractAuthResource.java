@@ -18,7 +18,6 @@ package np.com.ngopal.particle.cloud.api.resources;
 
 import java.util.List;
 import np.com.ngopal.particle.cloud.AccessToken;
-import np.com.ngopal.particle.cloud.Customer;
 import np.com.ngopal.particle.cloud.api.API;
 import np.com.ngopal.particle.cloud.api.exception.APIException;
 
@@ -26,10 +25,11 @@ import np.com.ngopal.particle.cloud.api.exception.APIException;
  *
  * @author Narayan <me@ngopal.com.np>
  */
-public interface AuthResource {
+public abstract class AbstractAuthResource extends APIResource implements
+        AuthResource {
 
-    AccessToken generateAccessToken() throws APIException;
-
-    List<AccessToken> listAccessToken() throws APIException;
+    public AbstractAuthResource(API api) {
+        super(api);
+    }
 
 }
