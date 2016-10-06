@@ -16,26 +16,23 @@
  */
 package np.com.ngopal.particle.cloud.api.resources;
 
-import java.util.List;
 import lombok.Getter;
-import np.com.ngopal.particle.cloud.Customer;
+import np.com.ngopal.particle.cloud.DeviceClaim;
 import np.com.ngopal.particle.cloud.api.API;
 import np.com.ngopal.particle.cloud.api.exception.APIException;
 
 /**
  *
- * @author NGM
+ * @author Narayan <me@ngopal.com.np>
  */
 @Getter
-public abstract class CustomerResource extends APIResource {
+public abstract class ProductResource extends APIResource {
 
-    public CustomerResource(API api) {
+    public ProductResource(API api) {
         super(api);
     }
 
-    public abstract Customer createCustomer(String productOrSlug, Customer customer)
+    public abstract DeviceClaim generateDeviceClaimCode(String productId, String customerEmail)
             throws APIException;
-
-    public abstract List<Customer> listCustomer(String productOrSlug) throws APIException;
 
 }

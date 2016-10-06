@@ -30,6 +30,8 @@ import lombok.*;
 @ToString
 public class Customer {
 
+    private String id;
+
     private String email;
 
     private String password;

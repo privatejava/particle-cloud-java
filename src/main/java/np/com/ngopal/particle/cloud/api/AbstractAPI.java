@@ -77,6 +77,18 @@ public abstract class AbstractAPI implements API {
     }
 
     @Override
+    public Map<String, String> getAccessTokenAuthHeaders(String customerEmail)
+            throws APIException {
+        Map<String, String> headers = new HashMap<>();
+        if (getAuthUser().getAccessToken() == null || getAuthUser().getAccessToken().isEmpty()) {
+            auth().generateCustomerAccessToken(customerEmail);
+        }
+        headers.put("Authorization", "Bearer " + getAuthUser().getAccessToken());
+
+        return headers;
+    }
+
+    @Override
     public void handleException(JSONObject object) throws APIException {
         int code = object.has("code") ? object.getInt("code") : 0;
         boolean ok = object.has("ok") ? object.getBoolean("ok") : false;

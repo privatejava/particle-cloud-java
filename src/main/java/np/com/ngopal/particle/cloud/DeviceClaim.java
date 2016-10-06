@@ -16,8 +16,11 @@
  */
 package np.com.ngopal.particle.cloud;
 
+import com.google.gson.annotations.SerializedName;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  *
@@ -25,10 +28,13 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@ToString
 public class DeviceClaim {
 
+    @SerializedName("claim_code")
     private String claimCode;
 
-    private String deviceIds;
+    @SerializedName("device_ids")
+    private List<String> deviceIds;
 
 }

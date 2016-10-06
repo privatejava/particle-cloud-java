@@ -30,6 +30,8 @@ public interface AuthResource {
 
     AccessToken generateAccessToken() throws APIException;
 
+    AccessToken generateCustomerAccessToken(String customer) throws APIException;
+
     List<AccessToken> listAccessToken() throws APIException;
 
 }

@@ -16,22 +16,50 @@
  */
 package np.com.ngopal.particle.cloud.api.resources;
 
+import com.google.gson.Gson;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.request.HttpRequest;
+import java.util.Map;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import np.com.ngopal.particle.cloud.api.API;
+import np.com.ngopal.particle.cloud.api.APIMethodType;
+import np.com.ngopal.particle.cloud.api.exception.APIException;
 
 /**
  *
  * @author NGM
  */
+@Slf4j
 @Getter
 public abstract class APIResource {
+
+    protected Gson gson;
 
     protected API api;
 
     public APIResource(API api) {
         this.api = api;
+        gson = new Gson();
     }
 
     public abstract String getBaseURIPattern();
+
+    protected HttpRequest getRestClient(APIMethodType type, String url, Map<String, String> headers)
+            throws APIException {
+        log.debug("URL : {}", url);
+        log.debug("Headers: {}", headers);
+
+        switch (type) {
+            case GET:
+                return Unirest.get(url).headers(headers);
+            case POST:
+                return Unirest.post(url).headers(headers);
+            case DELETE:
+                return Unirest.delete(url).headers(headers);
+        }
+
+        return null;
+    }
 
 }

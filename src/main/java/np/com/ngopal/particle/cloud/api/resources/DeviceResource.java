@@ -38,6 +38,10 @@ public abstract class DeviceResource extends APIResource {
 
     public abstract Device getDeviceInformation(String deviceId);
 
-    public abstract DeviceClaim createClaim(String imei, String iccid);
+    public abstract DeviceClaim createClaim(String imei, String customerEmail, String iccid)
+            throws APIException;
+
+    public abstract DeviceClaim createClaim(String iccid, String customerEmail)
+            throws APIException;
 
 }

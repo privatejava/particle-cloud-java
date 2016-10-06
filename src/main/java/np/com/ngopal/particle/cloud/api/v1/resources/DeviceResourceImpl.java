@@ -104,8 +104,31 @@ public class DeviceResourceImpl extends DeviceResource {
     }
 
     @Override
-    public DeviceClaim createClaim(String imei, String iccid) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public DeviceClaim createClaim(String iccid, String customerEmail, String imei)
+            throws APIException {
+        Map<String, String> headers = getApi().getAccessTokenAuthHeaders(customerEmail);
+        try {
+            String url = String.format("%s/%s", getApi().getRestUrl(), "device_claims");
+            HttpRequestWithBody request = ((HttpRequestWithBody) getRestClient(APIMethodType.POST, url, headers));
+            if (imei != null) {
+                request.field("imei", imei);
+            }
+            HttpResponse<JsonNode> response = request.field("iccid", iccid).asJson();
+            if (response.getStatus() == 200) {
+                return gson.fromJson(response.getBody().toString(), DeviceClaim.class);
+            } else {
+                api.handleException(response.getBody().getObject());
+            }
+        } catch (UnirestException ex) {
+            log.debug("{}", ex);
+            throw new APIException(ex);
+        }
+        return null;
+    }
+
+    @Override
+    public DeviceClaim createClaim(String iccid, String customerEmail) throws APIException {
+        return createClaim(iccid, customerEmail, null);
     }
 
     @Override

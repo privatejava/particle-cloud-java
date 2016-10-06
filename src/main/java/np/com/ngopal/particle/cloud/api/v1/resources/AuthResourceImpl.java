@@ -51,16 +51,25 @@ public class AuthResourceImpl extends AbstractAuthResource {
 
     @Override
     public AccessToken generateAccessToken() throws APIException {
-        return generateAccessToken(api.getAuthUser().getGrantType());
+        return generateAccessToken(api.getAuthUser().getGrantType(), null);
     }
 
-    private AccessToken generateAccessToken(String grantType) throws APIException {
+    @Override
+    public AccessToken generateCustomerAccessToken(String customerEmail) throws APIException {
+        return generateAccessToken("client_credentials", "customer=" + customerEmail);
+    }
+
+    private AccessToken generateAccessToken(String grantType, String scope)
+            throws APIException {
 
         try {
             Map<String, String> headers = api.getAuthHeaders();
             log.debug("Params: {}={}", "grant_type", grantType);
             MultipartBody req = ((HttpRequestWithBody) Unirest.post(api.getNonVersionedRestUrl() + "/oauth/token").headers(headers))
                     .field("grant_type", grantType);
+            if (scope != null) {
+                req.field("scope", scope);
+            }
 
             if (api.hasBasicCredential()) {
                 req.field("username", api.getAuthUser().getId());

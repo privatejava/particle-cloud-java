@@ -28,6 +28,7 @@ import np.com.ngopal.particle.cloud.api.AbstractAPI;
 import np.com.ngopal.particle.cloud.api.resources.AuthResource;
 import np.com.ngopal.particle.cloud.api.resources.CustomerResource;
 import np.com.ngopal.particle.cloud.api.resources.DeviceResource;
+import np.com.ngopal.particle.cloud.api.resources.ProductResource;
 
 /**
  *
@@ -43,6 +44,10 @@ public final class APIv1 extends AbstractAPI {
     @Getter(AccessLevel.NONE)
     @Setter
     private CustomerResource customerResource;
+
+    @Getter(AccessLevel.NONE)
+    @Setter
+    private ProductResource productResource;
 
     @Getter(AccessLevel.NONE)
     @Setter
@@ -92,6 +97,11 @@ public final class APIv1 extends AbstractAPI {
     @Override
     public AuthResource auth() {
         return this.authResource;
+    }
+
+    @Override
+    public ProductResource products() {
+        return this.productResource;
     }
 
     @Override
