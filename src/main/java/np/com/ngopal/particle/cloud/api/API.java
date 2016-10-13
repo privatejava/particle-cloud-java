@@ -47,6 +47,8 @@ public interface API {
 
     public boolean hasBasicCredential();
 
+    public boolean hasClientCredential();
+
     public CustomerResource customers();
 
     public DeviceResource devices();

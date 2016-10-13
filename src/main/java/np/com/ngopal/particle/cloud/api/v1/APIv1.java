@@ -109,4 +109,9 @@ public final class APIv1 extends AbstractAPI {
         return getAuthUser() instanceof BasicAuth;
     }
 
+    @Override
+    public boolean hasClientCredential() {
+        return getAuthUser() instanceof OAuthClient;
+    }
+
 }

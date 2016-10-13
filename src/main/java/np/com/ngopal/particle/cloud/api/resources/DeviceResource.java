@@ -17,6 +17,7 @@
 package np.com.ngopal.particle.cloud.api.resources;
 
 import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import np.com.ngopal.particle.cloud.Device;
 import np.com.ngopal.particle.cloud.DeviceClaim;
@@ -42,6 +43,12 @@ public abstract class DeviceResource extends APIResource {
             throws APIException;
 
     public abstract DeviceClaim createClaim(String iccid, String customerEmail)
+            throws APIException;
+
+    public abstract Map<String, String> claim(String deviceId, String customerEmail)
+            throws APIException;
+
+    public abstract Map<String, String> claim(String deviceId)
             throws APIException;
 
 }

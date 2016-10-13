@@ -46,11 +46,11 @@ public abstract class AbstractAPI implements API {
     }
 
     @Override
-    public Map<String, String> getAuthHeaders(boolean addAuthExplict) throws APIException {
+    public Map<String, String> getAuthHeaders(boolean clientDetails) throws APIException {
         Map<String, String> headers = new HashMap<>();
         if (getAuthUser().getAccessToken() == null || getAuthUser().getAccessToken().isEmpty()) {
 
-            if (hasBasicCredential() && !addAuthExplict) {
+            if (hasBasicCredential() && !clientDetails) {
                 headers.put("Authorization", "Basic "
                         + Base64.encodeBase64String("particle:particle".getBytes()));
             } else {

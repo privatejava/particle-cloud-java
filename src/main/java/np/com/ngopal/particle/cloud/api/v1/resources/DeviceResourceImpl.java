@@ -16,12 +16,16 @@
  */
 package np.com.ngopal.particle.cloud.api.v1.resources;
 
+import com.google.gson.reflect.TypeToken;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.BaseRequest;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,6 +40,7 @@ import np.com.ngopal.particle.cloud.api.API;
 import np.com.ngopal.particle.cloud.api.APIMethodType;
 import np.com.ngopal.particle.cloud.api.exception.APIException;
 import np.com.ngopal.particle.cloud.api.resources.DeviceResource;
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -46,7 +51,7 @@ import org.json.JSONObject;
 @Slf4j
 public class DeviceResourceImpl extends DeviceResource {
 
-    private String baseURIPattern = "/devices/:deviceId/:name";
+    private String baseURIPattern = "/devices";
 
     public DeviceResourceImpl(API api) {
         super(api);
@@ -57,13 +62,15 @@ public class DeviceResourceImpl extends DeviceResource {
         List<Device> devices = new ArrayList<>();
         try {
 
-            HttpResponse<JsonNode> response = getDeviceCreateRestClient(APIMethodType.GET, null, null).asJson();
+            HttpRequest req = getDeviceCreateRestClient(APIMethodType.GET, null, null);
+            HttpResponse<JsonNode> response = req.asJson();
+
             log.debug("Response : {}", response.getBody().toString());
             SimpleDateFormat format = new SimpleDateFormat(API.DATE_FORMAT);
             if (response.getStatus() == 200) {
                 JSONArray array = response.getBody().getArray();
-                array.forEach(d -> {
-                    JSONObject o = (JSONObject) d;
+                for (Object object : array) {
+                    JSONObject o = (JSONObject) object;
                     Device device = new Device();
                     device.setId(o.isNull("id") ? null : o.getString("id"));
                     try {
@@ -85,7 +92,7 @@ public class DeviceResourceImpl extends DeviceResource {
                     device.setLastIccid(o.isNull("last_iccid") ? null : o.getString("last_iccid"));
                     device.setPinnedBuildTarget(o.isNull("pinned_build_target") ? null : o.getString("pinned_build_target"));
                     devices.add(device);
-                });
+                }
 
             } else {
                 api.handleException(response.getBody().getObject());
@@ -126,6 +133,41 @@ public class DeviceResourceImpl extends DeviceResource {
         return null;
     }
 
+    private Map<String, String> claim(String deviceId, String email, Map<String, String> header)
+            throws APIException {
+        Map<String, String> values = null;
+
+        try {
+            HttpResponse<JsonNode> response = ((HttpRequestWithBody) getDeviceCreateRestClient(APIMethodType.POST, null, null))
+                    .field("id", deviceId).asJson();
+            log.debug("Response : {}", response.getBody().toString());
+            if (response.getStatus() == 200) {
+                Type type = new TypeToken<Map<String, String>>() {
+                }.getType();
+                values = gson.fromJson(response.getBody().toString(), type);
+            } else {
+                api.handleException(response.getBody().getObject());
+            }
+        } catch (UnirestException ex) {
+            log.debug("{}", ex);
+            throw new APIException(ex);
+        }
+
+        return values;
+    }
+
+    @Override
+    public Map<String, String> claim(String deviceId, String email) throws APIException {
+        Map<String, String> headers = getApi().getAccessTokenAuthHeaders(email);
+        return claim(deviceId, email, headers);
+    }
+
+    @Override
+    public Map<String, String> claim(String deviceId) throws APIException {
+        Map<String, String> headers = getApi().getAccessTokenAuthHeaders();
+        return claim(deviceId, null, headers);
+    }
+
     @Override
     public DeviceClaim createClaim(String iccid, String customerEmail) throws APIException {
         return createClaim(iccid, customerEmail, null);
@@ -141,19 +183,11 @@ public class DeviceResourceImpl extends DeviceResource {
 
         Map<String, String> headers = getApi().getAccessTokenAuthHeaders();
         log.debug("Headers: {}", headers);
-
-        String url = api.getRestUrl() + getBaseURIPattern().replace("/:deviceId", deviceId == null ? "" : "/" + deviceId).replace(":name", name == null ? "" : "/" + name);
+        log.debug("URL Meta: {} {}", api.getRestUrl(), getBaseURIPattern());
+        String url = String.format("%s%s%s%s", api.getRestUrl(), getBaseURIPattern(), deviceId == null ? "" : "/" + deviceId,
+                name == null ? "" : "/" + name);
         log.debug("URL : {}", url);
-        switch (type) {
-            case GET:
-                return Unirest.get(url).headers(headers);
-            case POST:
-                return Unirest.post(url).headers(headers);
-            case DELETE:
-                return Unirest.delete(url).headers(headers);
-        }
-
-        return null;
+        return getRestClient(type, url, headers);
     }
 
 }

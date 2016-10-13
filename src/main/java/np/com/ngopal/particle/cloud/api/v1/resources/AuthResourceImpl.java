@@ -23,9 +23,13 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import com.mashape.unirest.request.body.MultipartBody;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import lombok.extern.slf4j.Slf4j;
 import np.com.ngopal.particle.cloud.AccessToken;
 import np.com.ngopal.particle.cloud.OAuthClient;
@@ -33,6 +37,7 @@ import np.com.ngopal.particle.cloud.api.API;
 import np.com.ngopal.particle.cloud.api.APIMethodType;
 import np.com.ngopal.particle.cloud.api.exception.APIException;
 import np.com.ngopal.particle.cloud.api.resources.AbstractAuthResource;
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -56,6 +61,7 @@ public class AuthResourceImpl extends AbstractAuthResource {
 
     @Override
     public AccessToken generateCustomerAccessToken(String customerEmail) throws APIException {
+        api.getAuthUser().setAccessToken(null);
         return generateAccessToken("client_credentials", "customer=" + customerEmail);
     }
 
@@ -69,16 +75,33 @@ public class AuthResourceImpl extends AbstractAuthResource {
                     .field("grant_type", grantType);
             if (scope != null) {
                 req.field("scope", scope);
+                log.debug("Scope : {}", scope);
             }
 
             if (api.hasBasicCredential()) {
                 req.field("username", api.getAuthUser().getId());
                 req.field("password", api.getAuthUser().getSecret());
+            } else if (api.hasClientCredential() && !headers.containsKey("Authorization")) {
+                req.basicAuth(api.getAuthUser().getId(), api.getAuthUser().getSecret());
             }
 
+            log.debug("Requesting for oauth...");
+//            try {
+//                log.debug("Headers: {}", req.getHttpRequest().getHeaders());
+//                HttpResponse<InputStream> is = req.asBinary();
+//
+//                log.debug("Response: {}", IOUtils.toString(is.getBody()), "utf-8");
+//            } catch (IOException ex) {
+//                Logger.getLogger(AuthResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
+//            }
             HttpResponse<JsonNode> response = req.asJson();
 
             if (response.getStatus() == 200) {
+
+//                JSONArray arr = response.getBody().getArray();
+//                log.debug("{}", arr);
+//                for (Object obj : arr) {
+//                    JSONObject object = (JSONObject) obj;
                 JSONObject object = response.getBody().getObject();
                 log.debug("{}", object);
                 api.getAuthUser().setAccessToken(object.getString("access_token"));
@@ -86,11 +109,13 @@ public class AuthResourceImpl extends AbstractAuthResource {
                 api.getAuthUser().setExpiresIn(new Date(date));
                 api.getAuthUser().setRefreshToken(object.getString("refresh_token"));
                 api.getAuthUser().setTokenType(object.getString("token_type"));
+
+//                }
             } else {
                 api.handleException(response.getBody().getObject());
             }
         } catch (UnirestException ex) {
-            log.error("{}", ex);
+            log.error("{}", ex.getMessage(), ex);
             throw new APIException(ex);
         }
         return api.getAuthUser();
