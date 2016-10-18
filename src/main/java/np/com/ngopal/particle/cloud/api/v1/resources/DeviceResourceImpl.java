@@ -62,7 +62,7 @@ public class DeviceResourceImpl extends DeviceResource {
         List<Device> devices = new ArrayList<>();
         try {
 
-            HttpRequest req = getDeviceCreateRestClient(APIMethodType.GET, null, null);
+            HttpRequest req = getDeviceCreateRestClient(APIMethodType.GET, null, null, null);
             HttpResponse<JsonNode> response = req.asJson();
 
             log.debug("Response : {}", response.getBody().toString());
@@ -138,8 +138,31 @@ public class DeviceResourceImpl extends DeviceResource {
         Map<String, String> values = null;
 
         try {
-            HttpResponse<JsonNode> response = ((HttpRequestWithBody) getDeviceCreateRestClient(APIMethodType.POST, null, null))
+            HttpResponse<JsonNode> response = ((HttpRequestWithBody) getDeviceCreateRestClient(APIMethodType.POST, null, null, header))
                     .field("id", deviceId).asJson();
+            log.debug("Response : {}", response.getBody().toString());
+            if (response.getStatus() == 200) {
+                Type type = new TypeToken<Map<String, String>>() {
+                }.getType();
+                values = gson.fromJson(response.getBody().toString(), type);
+            } else {
+                api.handleException(response.getBody().getObject());
+            }
+        } catch (UnirestException ex) {
+            log.debug("{}", ex);
+            throw new APIException(ex);
+        }
+
+        return values;
+    }
+
+    private Map<String, String> unclaim(String deviceId, String email, Map<String, String> headers)
+            throws APIException {
+        Map<String, String> values = null;
+
+        try {
+            HttpResponse<JsonNode> response = ((HttpRequestWithBody) getDeviceCreateRestClient(APIMethodType.DELETE, deviceId, null, headers))
+                    .asJson();
             log.debug("Response : {}", response.getBody().toString());
             if (response.getStatus() == 200) {
                 Type type = new TypeToken<Map<String, String>>() {
@@ -169,6 +192,18 @@ public class DeviceResourceImpl extends DeviceResource {
     }
 
     @Override
+    public Map<String, String> unclaim(String deviceId, String email) throws APIException {
+        Map<String, String> headers = getApi().getAccessTokenAuthHeaders(email);
+        return unclaim(deviceId, email, headers);
+    }
+
+    @Override
+    public Map<String, String> unclaim(String deviceId) throws APIException {
+        Map<String, String> headers = getApi().getAccessTokenAuthHeaders();
+        return unclaim(deviceId, null, headers);
+    }
+
+    @Override
     public DeviceClaim createClaim(String iccid, String customerEmail) throws APIException {
         return createClaim(iccid, customerEmail, null);
     }
@@ -178,16 +213,16 @@ public class DeviceResourceImpl extends DeviceResource {
         return baseURIPattern;
     }
 
-    private HttpRequest getDeviceCreateRestClient(APIMethodType type, String deviceId, String name)
+    private HttpRequest getDeviceCreateRestClient(APIMethodType type, String deviceId, String name, Map<String, String> headers)
             throws APIException {
 
-        Map<String, String> headers = getApi().getAccessTokenAuthHeaders();
-        log.debug("Headers: {}", headers);
+        Map<String, String> _headers = headers == null ? getApi().getAccessTokenAuthHeaders() : headers;
+        log.debug("Headers: {}", _headers);
         log.debug("URL Meta: {} {}", api.getRestUrl(), getBaseURIPattern());
         String url = String.format("%s%s%s%s", api.getRestUrl(), getBaseURIPattern(), deviceId == null ? "" : "/" + deviceId,
                 name == null ? "" : "/" + name);
         log.debug("URL : {}", url);
-        return getRestClient(type, url, headers);
+        return getRestClient(type, url, _headers);
     }
 
 }
