@@ -57,4 +57,7 @@ public abstract class DeviceResource extends APIResource {
     public abstract Map<String, String> unclaim(String deviceId)
             throws APIException;
 
+    public abstract Map<String, String> callFunction(String deviceId, String functionName, String args)
+            throws APIException;
+
 }

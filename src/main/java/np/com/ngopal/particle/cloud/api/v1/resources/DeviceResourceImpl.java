@@ -49,7 +49,7 @@ import org.json.JSONObject;
  * @author NGM
  */
 @Slf4j
-public class DeviceResourceImpl extends DeviceResource {
+public final class DeviceResourceImpl extends DeviceResource {
 
     private String baseURIPattern = "/devices";
 
@@ -140,6 +140,35 @@ public class DeviceResourceImpl extends DeviceResource {
         try {
             HttpResponse<JsonNode> response = ((HttpRequestWithBody) getDeviceCreateRestClient(APIMethodType.POST, null, null, header))
                     .field("id", deviceId).asJson();
+            log.debug("Response : {}", response.getBody().toString());
+            if (response.getStatus() == 200) {
+                Type type = new TypeToken<Map<String, String>>() {
+                }.getType();
+                values = gson.fromJson(response.getBody().toString(), type);
+            } else {
+                api.handleException(response.getBody().getObject());
+            }
+        } catch (UnirestException ex) {
+            log.debug("{}", ex);
+            throw new APIException(ex);
+        }
+
+        return values;
+    }
+
+    @Override
+    public Map<String, String> callFunction(String deviceId, String functionName, String args)
+            throws APIException {
+        Map<String, String> values = null;
+
+        try {
+            Map<String, String> headers = getApi().getAccessTokenAuthHeaders();
+            HttpRequestWithBody request = ((HttpRequestWithBody) getDeviceCreateRestClient(APIMethodType.POST, deviceId, functionName, headers));
+            if (args != null) {
+                request.field("arg", args);
+            }
+            HttpResponse<JsonNode> response = request
+                    .asJson();
             log.debug("Response : {}", response.getBody().toString());
             if (response.getStatus() == 200) {
                 Type type = new TypeToken<Map<String, String>>() {
