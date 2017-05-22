@@ -106,13 +106,13 @@ public class CustomerResourceImpl extends CustomerResource {
                 log.debug("Response: {}", response.getBody());
                 JSONArray object = response.getBody().getArray();
 
-                for (Object obj : object) {
+               
 
 //                    JSONObject node = (JSONObject)obj;
 //                    Customer customer = new Customer();
 //                    customer.setId( node.getString("id"));
 //                    customer.set
-                }
+                
 
 //                customer.setTokenType(object.getString("token_type"));
 //                customer.setExpiresIn(object.getLong("expires_in"));

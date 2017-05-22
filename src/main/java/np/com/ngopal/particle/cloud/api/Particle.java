@@ -21,10 +21,7 @@ import np.com.ngopal.particle.cloud.BasicAuth;
 import np.com.ngopal.particle.cloud.OAuthClient;
 import np.com.ngopal.particle.cloud.api.resources.ProductResource;
 import np.com.ngopal.particle.cloud.api.v1.APIv1;
-import np.com.ngopal.particle.cloud.api.v1.resources.AuthResourceImpl;
-import np.com.ngopal.particle.cloud.api.v1.resources.CustomerResourceImpl;
-import np.com.ngopal.particle.cloud.api.v1.resources.DeviceResourceImpl;
-import np.com.ngopal.particle.cloud.api.v1.resources.ProductResourceImpl;
+import np.com.ngopal.particle.cloud.api.v1.resources.*;
 
 /**
  *
@@ -79,6 +76,7 @@ public final class Particle {
             apiV1.setDeviceResource(new DeviceResourceImpl(apiV1));
             apiV1.setAuthResource(new AuthResourceImpl(apiV1));
             apiV1.setProductResource(new ProductResourceImpl(apiV1));
+            apiV1.setSimCardResource(new SIMCardResourceImpl(apiV1)); 
             api = apiV1;
         }
         return api;

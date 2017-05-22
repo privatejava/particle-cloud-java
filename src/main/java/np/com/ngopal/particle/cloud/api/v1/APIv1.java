@@ -25,10 +25,7 @@ import np.com.ngopal.particle.cloud.AuthUser;
 import np.com.ngopal.particle.cloud.BasicAuth;
 import np.com.ngopal.particle.cloud.OAuthClient;
 import np.com.ngopal.particle.cloud.api.AbstractAPI;
-import np.com.ngopal.particle.cloud.api.resources.AuthResource;
-import np.com.ngopal.particle.cloud.api.resources.CustomerResource;
-import np.com.ngopal.particle.cloud.api.resources.DeviceResource;
-import np.com.ngopal.particle.cloud.api.resources.ProductResource;
+import np.com.ngopal.particle.cloud.api.resources.*;
 
 /**
  *
@@ -56,6 +53,10 @@ public final class APIv1 extends AbstractAPI {
     @Getter(AccessLevel.NONE)
     @Setter
     private AuthResource authResource;
+    
+    @Getter(AccessLevel.NONE)
+    @Setter
+    private SIMCardResource simCardResource;
 
     public APIv1(AuthUser client) {
         this.authUser = client;
@@ -105,6 +106,11 @@ public final class APIv1 extends AbstractAPI {
     }
 
     @Override
+    public SIMCardResource simCards() {
+        return this.simCardResource;
+    }
+    
+    @Override
     public boolean hasBasicCredential() {
         return getAuthUser() instanceof BasicAuth;
     }
@@ -113,5 +119,7 @@ public final class APIv1 extends AbstractAPI {
     public boolean hasClientCredential() {
         return getAuthUser() instanceof OAuthClient;
     }
+
+    
 
 }

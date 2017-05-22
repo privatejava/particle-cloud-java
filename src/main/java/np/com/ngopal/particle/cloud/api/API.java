@@ -19,10 +19,7 @@ package np.com.ngopal.particle.cloud.api;
 import java.util.Map;
 import np.com.ngopal.particle.cloud.AuthUser;
 import np.com.ngopal.particle.cloud.api.exception.APIException;
-import np.com.ngopal.particle.cloud.api.resources.AuthResource;
-import np.com.ngopal.particle.cloud.api.resources.CustomerResource;
-import np.com.ngopal.particle.cloud.api.resources.DeviceResource;
-import np.com.ngopal.particle.cloud.api.resources.ProductResource;
+import np.com.ngopal.particle.cloud.api.resources.*;
 import org.json.JSONObject;
 
 /**
@@ -54,6 +51,8 @@ public interface API {
     public DeviceResource devices();
 
     public ProductResource products();
+    
+    public SIMCardResource simCards();
 
     public <T extends AuthResource> T auth();
 
