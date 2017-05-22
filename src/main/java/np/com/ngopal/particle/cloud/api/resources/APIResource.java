@@ -17,6 +17,7 @@
 package np.com.ngopal.particle.cloud.api.resources;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.request.HttpRequest;
 import java.util.Map;
@@ -40,7 +41,7 @@ public abstract class APIResource {
 
     public APIResource(API api) {
         this.api = api;
-        gson = new Gson();
+        gson = new GsonBuilder().setDateFormat(API.DATE_FORMAT).create();
     }
 
     public abstract String getBaseURIPattern();
@@ -55,6 +56,8 @@ public abstract class APIResource {
                 return Unirest.get(url).headers(headers);
             case POST:
                 return Unirest.post(url).headers(headers);
+            case PUT:
+                return Unirest.put(url).headers(headers);
             case DELETE:
                 return Unirest.delete(url).headers(headers);
         }
