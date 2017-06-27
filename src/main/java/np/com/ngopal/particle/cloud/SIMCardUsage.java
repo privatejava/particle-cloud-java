@@ -17,6 +17,7 @@
 
 package np.com.ngopal.particle.cloud;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import java.util.Date;
 import java.util.List;
@@ -35,15 +36,19 @@ public class SIMCardUsage {
 
     private Float iccid;
 
+    @Expose
     @SerializedName("total_mb_used")
     private Float totalMBUsed;
 
+    @Expose
     @SerializedName("total_active_sim_cards")
     private Float totalActiveSimCards;
 
+    @Expose
     @SerializedName("total_cost")
     private Float totalCost;
 
+    @Expose
     @SerializedName(value = "daily_usage", alternate = {"usage_by_day"})
     private List<Usage> dailyUsage;
 
@@ -52,12 +57,15 @@ public class SIMCardUsage {
     @ToString
     final class Usage {
 
+        @Expose
         @SerializedName("date")
         private Date date;
 
+        @Expose
         @SerializedName("mb_used")
         private Float mbUsed;
 
+        @Expose
         @SerializedName("mb_used_cumulative")
         private Float mbUsedCumulative;
         

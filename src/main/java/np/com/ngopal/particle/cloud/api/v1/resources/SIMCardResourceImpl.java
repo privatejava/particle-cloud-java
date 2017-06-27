@@ -76,11 +76,13 @@ public class SIMCardResourceImpl extends SIMCardResource {
 
         Map<String, String> headers = getApi().getAccessTokenAuthHeaders();
         try {
-            String url = String.format("%s%s/%s/%s", getApi().getRestUrl(), baseURIPattern, productId, "sims/data_usage");
+            String url = String.format("%s%s/%s/sims/%s/data_usage", getApi().getRestUrl(), baseURIPattern, productId, iccid);
             HttpResponse<JsonNode> response = getRestClient(APIMethodType.GET, url, headers).asJson();
             if (response.getStatus() == 200) {
                 log.debug("Body: {}", response.getBody().toString());
-                return gson.fromJson(response.getBody().toString(), SIMCardUsage.class);
+                SIMCardUsage usage = gson.fromJson(response.getBody().toString(), SIMCardUsage.class);
+                log.debug("{}", usage);
+                return usage;
             } else {
                 api.handleException(response.getBody().getObject());
             }
