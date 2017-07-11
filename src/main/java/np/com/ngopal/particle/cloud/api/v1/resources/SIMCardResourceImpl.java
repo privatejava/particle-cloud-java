@@ -17,11 +17,13 @@
 
 package np.com.ngopal.particle.cloud.api.v1.resources;
 
+import com.google.gson.Gson;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import lombok.Getter;
@@ -32,6 +34,7 @@ import np.com.ngopal.particle.cloud.api.API;
 import np.com.ngopal.particle.cloud.api.APIMethodType;
 import np.com.ngopal.particle.cloud.api.exception.APIException;
 import np.com.ngopal.particle.cloud.api.resources.SIMCardResource;
+import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
 /**
@@ -80,9 +83,15 @@ public class SIMCardResourceImpl extends SIMCardResource {
             HttpResponse<JsonNode> response = getRestClient(APIMethodType.GET, url, headers).asJson();
             if (response.getStatus() == 200) {
                 log.debug("Body: {}", response.getBody().toString());
-                SIMCardUsage usage = gson.fromJson(response.getBody().toString(), SIMCardUsage.class);
-                log.debug("{}", usage);
-                return usage;
+                try {
+                    String data = IOUtils.toString(response.getRawBody(), "utf-8");
+                    SIMCardUsage usage = new Gson().fromJson(data, SIMCardUsage.class);
+                    log.debug("{}", usage);
+                    return usage;
+                } catch (IOException ex) {
+                    log.error("{}", ex.getMessage(), ex);
+                    throw new APIException(ex);
+                }
             } else {
                 api.handleException(response.getBody().getObject());
             }
@@ -141,13 +150,13 @@ public class SIMCardResourceImpl extends SIMCardResource {
             log.error("ImportAndActivateException: {}", ex.getMessage(), ex);
             throw new APIException(ex);
         }
-        
+
         return false;
     }
-    
+
     @Override
     public boolean importAndActivate(String productSlug, List<String> sims) throws APIException {
-        
+
         Map<String, String> headers = getApi().getAccessTokenAuthHeaders();
         try {
             String url = String.format("%s%s/%s/%s", getApi().getRestUrl(), baseURIPattern, productSlug, "sims");
@@ -161,7 +170,7 @@ public class SIMCardResourceImpl extends SIMCardResource {
             HttpResponse<JsonNode> response = request.asJson();
             if (response.getStatus() == 200) {
                 log.debug("Body: {}", response.getBody().toString());
-                return response.getBody().getObject().has("ok") && response.getBody().getObject().getBoolean("ok"); 
+                return response.getBody().getObject().has("ok") && response.getBody().getObject().getBoolean("ok");
             } else {
                 api.handleException(response.getBody().getObject());
             }
@@ -174,18 +183,18 @@ public class SIMCardResourceImpl extends SIMCardResource {
 
     @Override
     public boolean setDataLimit(int mbLimit, String iccid, String productSlug) throws APIException {
-         Map<String, String> headers = getApi().getAccessTokenAuthHeaders();
+        Map<String, String> headers = getApi().getAccessTokenAuthHeaders();
         try {
             String url = String.format("%s/%s/%s", getApi().getRestUrl(), "sims", iccid);
             HttpRequestWithBody request = ((HttpRequestWithBody) getRestClient(APIMethodType.PUT, url, headers));
             request.header("Content-Type", "application/json");
             JSONObject object = new JSONObject();
-            object.put("mb_limit",mbLimit);
+            object.put("mb_limit", mbLimit);
             object.put("productIdOrSlug", productSlug);
             request.body(object);
             HttpResponse<JsonNode> response = request.asJson();
             if (response.getStatus() == 200) {
-                return true; 
+                return true;
             } else {
                 api.handleException(response.getBody().getObject());
             }

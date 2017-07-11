@@ -19,9 +19,9 @@ package np.com.ngopal.particle.cloud;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import java.util.Date;
 import java.util.List;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -32,19 +32,17 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
 public class SIMCardUsage {
 
-    private Float iccid;
+    private String iccid;
 
-    @Expose
     @SerializedName("total_mb_used")
     private Float totalMBUsed;
 
-    @Expose
     @SerializedName("total_active_sim_cards")
     private Float totalActiveSimCards;
 
-    @Expose
     @SerializedName("total_cost")
     private Float totalCost;
 
@@ -55,19 +53,17 @@ public class SIMCardUsage {
     @Getter
     @Setter
     @ToString
-    final class Usage {
+    @NoArgsConstructor
+    class Usage {
 
-        @Expose
         @SerializedName("date")
-        private Date date;
+        private String date;
 
-        @Expose
-        @SerializedName("mb_used")
+        @SerializedName(value = "mb_used", alternate="mbs_used")
         private Float mbUsed;
 
-        @Expose
-        @SerializedName("mb_used_cumulative")
+        @SerializedName(value = "mb_used_cumulative", alternate={"mbs_used_cumulative"})
         private Float mbUsedCumulative;
-        
+
     }
 }
