@@ -128,7 +128,7 @@ public class AuthResourceImpl extends AbstractAuthResource {
             HttpResponse<JsonNode> response = Unirest.get(api.getRestUrl() + getBaseURIPattern()).headers(api.getAuthHeaders(true)).asJson();
             log.debug("URL: {}", api.getRestUrl() + getBaseURIPattern());
             if (response.getStatus() == 200) {
-                log.debug("Response: {}", response.getBody());
+                //log.debug("Response: {}", response.getBody());
                 JSONArray array = response.getBody().getArray();
                 if (array.length() > 0) {
 
