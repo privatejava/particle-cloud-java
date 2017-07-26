@@ -48,6 +48,8 @@ public abstract class SIMCardResource extends APIResource {
     
     public abstract boolean deactivate(String productSlug, String iccid) throws APIException;
     
+    public abstract boolean reactive( String iccid) throws APIException;
+    
     public abstract boolean setDataLimit(int mb, String iccid,String productSlug) throws APIException;
     
 }

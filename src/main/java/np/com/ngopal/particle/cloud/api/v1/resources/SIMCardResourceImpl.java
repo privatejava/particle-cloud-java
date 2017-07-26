@@ -205,4 +205,29 @@ public class SIMCardResourceImpl extends SIMCardResource {
         return false;
     }
 
+    @Override
+    public boolean reactive(String iccid) throws APIException {
+        Map<String, String> headers = getApi().getAccessTokenAuthHeaders();
+        try {
+            String url = String.format("%s/%s/%s", getApi().getRestUrl(),   "sims", iccid);
+            HttpRequestWithBody request = ((HttpRequestWithBody) getRestClient(APIMethodType.PUT, url, headers));
+            request.header("Content-Type", "application/json");
+            JSONObject object = new JSONObject();
+            object.put("action", "reactivate");
+            request.body(object);
+            HttpResponse<JsonNode> response = request.asJson();
+            if (response.getStatus() == 200) {
+                log.debug("Body: {}", response.getBody().toString());
+                return response.getStatus() == 200;
+//                return response.getBody().getObject().has("ok") && response.getBody().getObject().getBoolean("ok");
+            } else {
+                api.handleException(response.getBody().getObject());
+            }
+        } catch (Exception ex) {
+            log.error("ImportAndActivateException: {}", ex.getMessage(), ex);
+            throw new APIException(ex);
+        }
+        return false;
+    }
+
 }
