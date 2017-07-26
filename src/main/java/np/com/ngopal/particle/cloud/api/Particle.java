@@ -77,6 +77,7 @@ public final class Particle {
             apiV1.setAuthResource(new AuthResourceImpl(apiV1));
             apiV1.setProductResource(new ProductResourceImpl(apiV1));
             apiV1.setSimCardResource(new SIMCardResourceImpl(apiV1)); 
+            apiV1.setEventResource(new EventResourceImpl(apiV1)); 
             api = apiV1;
         }
         return api;

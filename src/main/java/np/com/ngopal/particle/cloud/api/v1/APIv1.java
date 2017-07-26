@@ -58,6 +58,10 @@ public final class APIv1 extends AbstractAPI {
     @Setter
     private SIMCardResource simCardResource;
 
+    @Getter(AccessLevel.NONE)
+    @Setter
+    private EventResource eventResource;
+
     public APIv1(AuthUser client) {
         this.authUser = client;
     }
@@ -118,6 +122,11 @@ public final class APIv1 extends AbstractAPI {
     @Override
     public boolean hasClientCredential() {
         return getAuthUser() instanceof OAuthClient;
+    }
+
+    @Override
+    public EventResource events() {
+        return this.eventResource;
     }
 
     

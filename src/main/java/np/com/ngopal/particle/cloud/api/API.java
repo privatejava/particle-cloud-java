@@ -52,6 +52,8 @@ public interface API {
 
     public ProductResource products();
     
+    public EventResource events();
+    
     public SIMCardResource simCards();
 
     public <T extends AuthResource> T auth();
