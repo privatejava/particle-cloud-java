@@ -67,6 +67,9 @@ public interface API {
     public Map<String, String> getAccessTokenAuthHeaders(String customerEmail)
             throws APIException;
 
+    public Map<String, String> getAccessTokenAuthHeaders(String customerEmail, Long seconds)
+            throws APIException;
+    
     public void handleException(JSONObject object) throws APIException;
 
 }

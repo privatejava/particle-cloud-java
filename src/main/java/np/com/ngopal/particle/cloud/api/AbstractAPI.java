@@ -77,15 +77,21 @@ public abstract class AbstractAPI implements API {
     }
 
     @Override
-    public Map<String, String> getAccessTokenAuthHeaders(String customerEmail)
+    public Map<String, String> getAccessTokenAuthHeaders(String customerEmail,Long time)
             throws APIException {
         Map<String, String> headers = new HashMap<>();
         if (getAuthUser().getAccessToken() == null || getAuthUser().getAccessToken().isEmpty()) {
-            auth().generateCustomerAccessToken(customerEmail);
+            auth().generateCustomerAccessToken(customerEmail,time);
         }
         headers.put("Authorization", "Bearer " + getAuthUser().getAccessToken());
 
         return headers;
+    }
+    
+    @Override
+    public Map<String, String> getAccessTokenAuthHeaders(String customerEmail)
+            throws APIException {
+        return getAccessTokenAuthHeaders(customerEmail,600L);
     }
 
     @Override

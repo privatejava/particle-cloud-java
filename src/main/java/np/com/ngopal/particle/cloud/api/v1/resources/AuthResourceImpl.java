@@ -58,6 +58,16 @@ public class AuthResourceImpl extends AbstractAuthResource {
     public AccessToken generateAccessToken() throws APIException {
         return generateAccessToken(api.getAuthUser().getGrantType(), null);
     }
+    @Override
+    public AccessToken generateAccessToken(Long second) throws APIException {
+        return generateAccessToken(api.getAuthUser().getGrantType(), null,second);
+    }
+
+    @Override
+    public AccessToken generateCustomerAccessToken(String customerEmail, Long second) throws APIException {
+        api.getAuthUser().setAccessToken(null);
+        return generateAccessToken("client_credentials", "customer=" + customerEmail, second);
+    }
 
     @Override
     public AccessToken generateCustomerAccessToken(String customerEmail) throws APIException {
@@ -65,27 +75,36 @@ public class AuthResourceImpl extends AbstractAuthResource {
         return generateAccessToken("client_credentials", "customer=" + customerEmail);
     }
 
-    private AccessToken generateAccessToken(String grantType, String scope)
+    private AccessToken generateAccessToken(String grantType, String scope) throws APIException {
+        return generateAccessToken(grantType, scope, 600L);
+    }
+
+    private AccessToken generateAccessToken(String grantType, String scope, Long expireInSeconds)
             throws APIException {
 
         try {
             Map<String, String> headers = api.getAuthHeaders();
-            log.debug("Params: {}={}", "grant_type", grantType);
+//            log.debug("Params: {}={}", "grant_type", grantType);
             MultipartBody req = ((HttpRequestWithBody) Unirest.post(api.getNonVersionedRestUrl() + "/oauth/token").headers(headers))
                     .field("grant_type", grantType);
+//            log.debug("Expires: {}", expireInSeconds);
+//            log.debug("Grant Type: {}", grantType);
+//            log.debug("Auth: {}", api.getNonVersionedRestUrl() + "/oauth/token");
             if (scope != null) {
                 req.field("scope", scope);
-                log.debug("Scope : {}", scope);
+//                log.debug("Scope : {}", scope);
             }
 
             if (api.hasBasicCredential()) {
                 req.field("username", api.getAuthUser().getId());
                 req.field("password", api.getAuthUser().getSecret());
+
             } else if (api.hasClientCredential() && !headers.containsKey("Authorization")) {
                 req.basicAuth(api.getAuthUser().getId(), api.getAuthUser().getSecret());
             }
+            req.field("expires_in", expireInSeconds);
 
-            log.debug("Requesting for oauth...");
+//            log.debug("Requesting for oauth...");
 //            try {
 //                log.debug("Headers: {}", req.getHttpRequest().getHeaders());
 //                HttpResponse<InputStream> is = req.asBinary();

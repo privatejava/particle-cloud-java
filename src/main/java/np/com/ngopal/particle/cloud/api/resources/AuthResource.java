@@ -29,8 +29,12 @@ import np.com.ngopal.particle.cloud.api.exception.APIException;
 public interface AuthResource {
 
     AccessToken generateAccessToken() throws APIException;
+    
+    AccessToken generateAccessToken(Long second) throws APIException;
 
     AccessToken generateCustomerAccessToken(String customer) throws APIException;
+    
+    AccessToken generateCustomerAccessToken(String customer, Long second) throws APIException;
 
     List<AccessToken> listAccessToken() throws APIException;
 
