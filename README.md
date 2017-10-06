@@ -1,4 +1,4 @@
-# Particle Cloud API
+# Particle Cloud Java API
 
 This library makes easier to run the particle clould API using Java language. 
 
