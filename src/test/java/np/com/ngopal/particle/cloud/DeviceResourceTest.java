@@ -1,7 +1,11 @@
 package np.com.ngopal.particle.cloud;
 
+import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import np.com.ngopal.particle.cloud.Device;
 import np.com.ngopal.particle.cloud.api.Particle;
 import np.com.ngopal.particle.cloud.api.exception.APIException;
+import org.junit.Before;
 import org.junit.Test;
 
 /*
@@ -24,19 +28,25 @@ import org.junit.Test;
  *
  * @author Narayan <me@ngopal.com.np>
  */
-public class ParticleResourceTest {
+@Slf4j
+public class DeviceResourceTest {
 
-    public static Particle client() {
-        return Particle.client("marcopolo-web-x-5662", "3c9ae65f71a011505dd9d746e5b9a725d34b717b");
-    }
+    private Particle particle;
 
-    public static Particle basic() {
-        return Particle.basic("brian.quinn@cbts.net", "changemeCBTS!");
+    @Before
+    public void getParticle() {
+        particle = ParticleResourceTest.client();
     }
 
     @Test
-    public void accessToken() throws APIException {
-        basic().api().auth().listAccessToken();
+    public void getAllDevices() throws APIException {
+        log.info("Something is happening");
+        System.out.println("Debug");
+        List<Device> devices = particle.api().devices().listDevices();
+        for (Device device : devices) {
+            log.debug("Device: {}", device);
+        }
+
     }
 
 }

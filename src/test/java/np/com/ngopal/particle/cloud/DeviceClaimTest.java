@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Narayan G. Maharjan <me@ngopal.com.np>
+ * Copyright (C) 2017 Narayan G. Maharjan <me@ngopal.com.np>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,22 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package np.com.ngopal.particle.cloud.api.resources;
 
-import java.util.List;
-import np.com.ngopal.particle.cloud.AccessToken;
-import np.com.ngopal.particle.cloud.api.API;
+package np.com.ngopal.particle.cloud;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import lombok.extern.slf4j.Slf4j;
+import np.com.ngopal.particle.cloud.api.Particle;
 import np.com.ngopal.particle.cloud.api.exception.APIException;
+import org.junit.Test;
 
 /**
  *
- * @author Narayan <me@ngopal.com.np>
+ * @author NGM
  */
-public abstract class AbstractAuthResource extends APIResource implements
-        AuthResource {
+@Slf4j
+public class DeviceClaimTest {
 
-    public AbstractAuthResource(API api) {
-        super(api);
+    @Test
+    public void main() {
+        try {
+            Particle particle = Particle.client("<client-id>", "<client-secret>");
+            SIMCardUsage usage = particle.api().simCards().getDataUsageForProductFleet("<product-id>");
+        } catch (APIException ex) {
+            Logger.getLogger(DeviceClaimTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
 }
