@@ -49,3 +49,4 @@ for (Device device : devices) {
 Particle particle = Particle.client("<client-id>", "<client-secret>");
 SIMCardUsage usage = particle.api().simCards().getDataUsageForProductFleet("<product-id>");
 ```
+#### Javadocs : https://privatejava.github.io/particle-cloud-java/
