@@ -53,6 +53,9 @@ public abstract class DeviceResource extends APIResource {
 
     public abstract Map<String, String> unclaim(String deviceId, String customerEmail)
             throws APIException;
+    
+    public abstract Map<String, String> unclaimProductDevice(String productId, String deviceId)
+            throws APIException;
 
     public abstract Map<String, String> unclaim(String deviceId)
             throws APIException;

@@ -185,13 +185,22 @@ public final class DeviceResourceImpl extends DeviceResource {
         return values;
     }
 
-    private Map<String, String> unclaim(String deviceId, String email, Map<String, String> headers)
+    private Map<String, String> unclaim(String deviceId, String email, String productId, Map<String, String> headers)
             throws APIException {
         Map<String, String> values = null;
+        HttpResponse<JsonNode> response = null;
+        HttpRequest req = null;
 
         try {
-            HttpResponse<JsonNode> response = ((HttpRequestWithBody) getDeviceCreateRestClient(APIMethodType.DELETE, deviceId, null, headers))
-                    .asJson();
+            if(productId != null && !productId.isEmpty()) {
+                Map<String, String> _headers = headers == null ? getApi().getAccessTokenAuthHeaders() : headers;
+                String url =  String.format("%s/products/%s%s/%s/owner", getApi().getRestUrl(), productId, baseURIPattern,deviceId);
+                req = getRestClient(APIMethodType.DELETE, url, _headers);
+            }else{
+                req = getDeviceCreateRestClient(APIMethodType.DELETE, deviceId, null, headers);
+            }
+            
+            response = req.asJson();
             log.debug("Response : {}", response.getBody().toString());
             if (response.getStatus() == 200) {
                 Type type = new TypeToken<Map<String, String>>() {
@@ -223,13 +232,19 @@ public final class DeviceResourceImpl extends DeviceResource {
     @Override
     public Map<String, String> unclaim(String deviceId, String email) throws APIException {
         Map<String, String> headers = getApi().getAccessTokenAuthHeaders(email);
-        return unclaim(deviceId, email, headers);
+        return unclaim(deviceId, email, null, headers);
     }
 
     @Override
     public Map<String, String> unclaim(String deviceId) throws APIException {
         Map<String, String> headers = getApi().getAccessTokenAuthHeaders();
-        return unclaim(deviceId, null, headers);
+        return unclaim(deviceId, null, null, headers);
+    }
+
+    @Override
+    public Map<String, String> unclaimProductDevice(String productId, String deviceId) throws APIException {
+        Map<String, String> headers = getApi().getAccessTokenAuthHeaders();
+        return unclaim(deviceId, null, productId, headers);
     }
 
     @Override
