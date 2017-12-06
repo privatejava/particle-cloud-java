@@ -1,5 +1,6 @@
 /target/
 /src/main/java/np/com/ngopal/particle/cloud/CloudAPI.java
+/src/test/java/np/com/ngopal/particle/cloud/SimpleTest.java
 /src/main/resources/rebel.xml
 /nb_jr_remoting.cfg
 /.reb*
