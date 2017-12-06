@@ -41,7 +41,7 @@ public class SimpleTest {
         customer.setPassword("testpass");
         try {
             System.out.println("Hello");
-            API api = Particle.client("marcopolo-web-x-5662", "3c9ae65f71a011505dd9d746e5b9a725d34b717b").api();
+            API api = Particle.client("marcopolo-web-x-56623", "3c9ae65f71a011505dd9d746e5b9a725d34b717e").api();
             
 //            api.auth().generateAccessToken();
 //            Customer c = api.customers().createCustomer("marcopolo-v100", customer);
