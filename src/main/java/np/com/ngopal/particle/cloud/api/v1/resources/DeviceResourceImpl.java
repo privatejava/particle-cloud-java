@@ -19,12 +19,10 @@ package np.com.ngopal.particle.cloud.api.v1.resources;
 import com.google.gson.reflect.TypeToken;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.BaseRequest;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -40,7 +38,6 @@ import np.com.ngopal.particle.cloud.api.API;
 import np.com.ngopal.particle.cloud.api.APIMethodType;
 import np.com.ngopal.particle.cloud.api.exception.APIException;
 import np.com.ngopal.particle.cloud.api.resources.DeviceResource;
-import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -163,7 +160,10 @@ public final class DeviceResourceImpl extends DeviceResource {
 
         try {
             Map<String, String> headers = getApi().getAccessTokenAuthHeaders();
+
+            Unirest.setTimeouts(3000, 3000);
             HttpRequestWithBody request = ((HttpRequestWithBody) getDeviceCreateRestClient(APIMethodType.POST, deviceId, functionName, headers));
+
             if (args != null) {
                 request.field("arg", args);
             }
@@ -180,6 +180,8 @@ public final class DeviceResourceImpl extends DeviceResource {
         } catch (UnirestException ex) {
             log.debug("{}", ex);
             throw new APIException(ex);
+        } finally {
+            Unirest.setTimeouts(10000, 10000);
         }
 
         return values;
@@ -192,14 +194,14 @@ public final class DeviceResourceImpl extends DeviceResource {
         HttpRequest req = null;
 
         try {
-            if(productId != null && !productId.isEmpty()) {
+            if (productId != null && !productId.isEmpty()) {
                 Map<String, String> _headers = headers == null ? getApi().getAccessTokenAuthHeaders() : headers;
-                String url =  String.format("%s/products/%s%s/%s/owner", getApi().getRestUrl(), productId, baseURIPattern,deviceId);
+                String url = String.format("%s/products/%s%s/%s/owner", getApi().getRestUrl(), productId, baseURIPattern, deviceId);
                 req = getRestClient(APIMethodType.DELETE, url, _headers);
-            }else{
+            } else {
                 req = getDeviceCreateRestClient(APIMethodType.DELETE, deviceId, null, headers);
             }
-            
+
             response = req.asJson();
             log.debug("Response : {}", response.getBody().toString());
             if (response.getStatus() == 200) {
@@ -265,7 +267,7 @@ public final class DeviceResourceImpl extends DeviceResource {
         log.debug("URL Meta: {} {}", api.getRestUrl(), getBaseURIPattern());
         String url = String.format("%s%s%s%s", api.getRestUrl(), getBaseURIPattern(), deviceId == null ? "" : "/" + deviceId,
                 name == null ? "" : "/" + name);
-        log.debug("URL : {}", url);
+        log.debug("URL :{} {}", type, url);
         return getRestClient(type, url, _headers);
     }
 
