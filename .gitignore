@@ -4,3 +4,5 @@
 /src/main/resources/rebel.xml
 /nb_jr_remoting.cfg
 /.reb*
+**/*.iml
+.idea
